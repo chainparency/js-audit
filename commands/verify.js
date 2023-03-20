@@ -18,7 +18,7 @@ const inputs = [
 
 async function verify(id) {
     console.log(chalk.yellow(`Verifying a trace ${id}...`))
-    let path = `${id}.json`
+    let path = `public_trace_${id}.json`
     if (!fs.existsSync(path)) {
         throw new Error('File is not found: ' + path + ' try to download it again')
     }
@@ -29,20 +29,8 @@ async function verify(id) {
             return element.multihash !== undefined;
         });
         console.log(chalk.green.bold('The public trace ' + id + ' have ' + filteredArray.length + ' events'))
-        for (const element of filteredArray) {
-            let url = `https://api.gotrace.world/v1/public/eventFile/${element.multihash}`
-            try {
-                response = await axios.get(url, { responseType: 'arraybuffer' })
-            } catch (error) {
-                console.log(chalk.red.bold(`The event file ${url} cannot be downloaded: ` + error))
-            }
-            fs.writeFileSync(`${element.multihash}.json`, response.data, function (err) {
-                if (err) {
-                    chalk.red.bold(`The public trace for ${element.multihash} cannot be saved: ` + err);
-                }
-            }
-            );
-            const buff = fs.readFileSync(`${element.multihash}.json`);
+        for (const element of filteredArray) {            
+            const buff = fs.readFileSync(`checkpoint_${element.multihash}.json`);
             multihash = SHA256Prefix + crypto.createHash('sha256').update(buff).digest('hex')
             const bs58String = bs58.encode(Buffer.from(multihash, "hex"))
             let web3 = new Web3("https://rpc.gochain.io");

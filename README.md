@@ -38,6 +38,6 @@ node index.js verify PUBLIC_TRACE_ID
 3. Calculate hash of every checkpoint using the following command:
 
 ```
-multihash -algorithm="sha2-256" -encoding="base58" CHECKPOINT_ID
+multihash -algorithm="sha2-256" -encoding="base58" checkpoint_{CHECKPOINT_ID}
 ```
 4. Confirm that calculated hash and the hash on the blockchain are the same (https://explorer.gochain.io/tx/TX_ID).

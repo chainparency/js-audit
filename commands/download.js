@@ -10,12 +10,33 @@ async function download(id) {
         response = await axios.get(url)
     } catch (error) {
         console.log(chalk.red.bold(`The public trace ${url} cannot be downloaded: ` + error))
-    }    
-    fs.writeFileSync(`${id}.json`, JSON.stringify(response.data), function (err) {
+    }
+    let parsedData = response.data
+    fs.writeFileSync(`public_trace_${id}.json`, JSON.stringify(parsedData), function (err) {
         if (err) throw err;
         chalk.red.bold('The public trace cannot be saved: ' + err);
     }
     );
+    if (parsedData.trace != null && parsedData.trace.supply_graph != null && parsedData.trace.supply_graph.shipments[id] != null) {
+        filteredArray = parsedData.trace.supply_graph.shipments[id].events.filter(function (element) {
+            return element.multihash !== undefined;
+        });
+        console.log(chalk.green.bold('The public trace ' + id + ' have ' + filteredArray.length + ' events'))
+        for (const element of filteredArray) {
+            let url = `https://api.gotrace.world/v1/public/eventFile/${element.multihash}`
+            try {
+                response = await axios.get(url, { responseType: 'arraybuffer' })
+            } catch (error) {
+                console.log(chalk.red.bold(`The event file ${url} cannot be downloaded: ` + error))
+            }
+            fs.writeFileSync(`checkpoint_${element.multihash}.json`, response.data, function (err) {
+                if (err) {
+                    chalk.red.bold(`The public trace for ${element.multihash} cannot be saved: ` + err);
+                }
+            }
+            );
+        }
+    }
 }
 
 module.exports = download
