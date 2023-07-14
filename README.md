@@ -25,7 +25,7 @@ npm i
 node index.js download PUBLIC_TRACE_ID
 ```
 
-2. To veridy a downloaded trace:
+2. To verify a downloaded trace:
 
 ```
 node index.js verify PUBLIC_TRACE_ID
